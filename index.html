@@ -1,13 +1,126 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>resume-builder</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Resume Builder</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:12px Arial;background:#eef3f8;color:#18253a}
+header{background:#07162f;color:white;text-align:center;padding:18px}
+button,select{background:#0878ed;color:white;border:0;padding:9px;border-radius:5px}
+.container{max-width:900px;margin:15px auto;padding:10px}
+.card,.resume{background:white;padding:16px;border-radius:8px;margin-bottom:15px;box-shadow:0 1px 7px #ccc}
+.title{border-left:3px solid #0878ed;padding-left:6px;font-weight:bold;margin:12px 0 6px}
+input,textarea,select{width:100%;padding:8px;margin:3px 0;border:1px solid #ddd;border-radius:5px;font-size:11px}
+textarea{height:55px}.resume h1{margin:0}.job{color:#0878ed}
+.sec{margin-top:15px}.sec h4{border-bottom:1px solid #555;padding-bottom:5px}
+#photo{width:80px;height:80px;border-radius:50%;object-fit:cover;display:none;margin-bottom:8px}
+@media(min-width:700px){.container{display:grid;grid-template-columns:1fr 1fr;gap:15px}}
+@media print{header,.card{display:none}.resume{box-shadow:none}}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>ResumeBuilder</h1>
+<p>Create a professional resume in minutes</p>
+<button onclick="print()">Download Resume</button>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>Build Your Resume</h2>
+
+<div class="title">Choose Template</div>
+<select id="temp" onchange="template()">
+<option value="1">Classic</option>
+<option value="2">Modern</option>
+<option value="3">Simple</option>
+</select>
+
+<div class="title">Profile Photo</div>
+<input type="file" id="pic" accept="image/*">
+
+<div class="title">Personal Information</div>
+<input id="n" placeholder="Full Name">
+<input id="j" placeholder="Job Title / Career">
+<input id="e" placeholder="Email Address">
+<input id="p" placeholder="Phone Number">
+<input id="l" placeholder="City, State">
+
+<div class="title">Professional Summary</div>
+<textarea id="s" placeholder="Write a short professional summary..."></textarea>
+
+<div class="title">Work Experience</div>
+<textarea id="x" placeholder="Company name, job role, responsibilities..."></textarea>
+
+<div class="title">Education</div>
+<textarea id="ed" placeholder="Degree, college/university, year..."></textarea>
+
+<div class="title">Skills</div>
+<textarea id="sk" placeholder="Java, Python, JavaScript, React, SQL..."></textarea>
+
+<div class="title">Projects</div>
+<textarea id="pr" placeholder="Project name and description..."></textarea>
+
+<button onclick="print()">Download / Print Resume</button>
+</div>
+
+<div class="resume" id="resume">
+
+<img id="photo">
+
+<h1 id="rn">YOUR NAME</h1>
+<div class="job" id="rj">Professional Title</div>
+
+<p id="rc">email@example.com<br>
++91 9876543210<br>
+Your Location</p>
+
+<div class="sec"><h4>PROFILE</h4><p id="rs">Your professional summary will appear here.</p></div>
+<div class="sec"><h4>EXPERIENCE</h4><p id="rx">Your work experience will appear here.</p></div>
+<div class="sec"><h4>EDUCATION</h4><p id="red">Your education details will appear here.</p></div>
+<div class="sec"><h4>SKILLS</h4><p id="rsk">Your skills will appear here.</p></div>
+<div class="sec"><h4>PROJECTS</h4><p id="rpr">Your project details will appear here.</p></div>
+
+</div>
+</div>
+
+<script>
+let a=[
+["n","rn","YOUR NAME"],["j","rj","Professional Title"],
+["s","rs","Your professional summary will appear here."],
+["x","rx","Your work experience will appear here."],
+["ed","red","Your education details will appear here."],
+["sk","rsk","Your skills will appear here."],
+["pr","rpr","Your project details will appear here."]
+];
+
+a.forEach(x=>document.getElementById(x[0]).oninput=()=>{
+document.getElementById(x[1]).innerText=
+document.getElementById(x[0]).value||x[2]});
+
+["e","p","l"].forEach(id=>
+document.getElementById(id).oninput=()=>{
+rc.innerHTML=
+`${e.value||"email@example.com"}<br>${p.value||"+91 9876543210"}<br>${l.value||"Your Location"}`
+});
+
+/* PHOTO */
+pic.onchange=()=>{
+let r=new FileReader();
+r.onload=()=>{photo.src=r.result;photo.style.display="block"};
+r.readAsDataURL(pic.files[0]);
+};
+
+/* TEMPLATES */
+function template(){
+let t=temp.value,r=resume;
+r.style.borderTop=t==2?"6px solid #0878ed":t==3?"":"";
+r.style.textAlign=t==2?"center":"left";
+r.style.fontFamily=t==3?"Georgia":"Arial";
+}
+</script>
+
+</body>
 </html>
