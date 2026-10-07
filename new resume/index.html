@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ATS Resume Builder</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;font:12px Arial;background:#eef3f8;color:#172033
+}
+header{
+ background:#07162f;color:white;text-align:center;padding:18px
+}
+header h1{margin:0 0 5px}
+button{
+ background:#0878ed;color:white;border:0;padding:9px 14px;
+ border-radius:5px;cursor:pointer;margin:3px
+}
+.main{max-width:950px;margin:15px auto;padding:10px}
+.card,.resume{
+ background:white;padding:16px;border-radius:8px;
+ box-shadow:0 1px 7px #ccc;margin-bottom:15px
+}
+.title{
+ border-left:3px solid #0878ed;padding-left:7px;
+ font-weight:bold;margin:13px 0 6px
+}
+input,textarea,select{
+ width:100%;padding:9px;margin:3px 0;
+ border:1px solid #ddd;border-radius:5px;font-size:11px
+}
+textarea{height:55px}
+.score{
+ background:#eef8ff;padding:10px;border-radius:6px;margin:10px 0
+}
+#photo{
+ width:80px;height:80px;object-fit:cover;
+ border-radius:50%;display:none;margin-bottom:8px
+}
+.resume h1{margin:0}
+.job{color:#0878ed}
+.sec{margin-top:17px}
+.sec h4{
+ border-bottom:1px solid #444;
+ padding-bottom:5px;margin-bottom:6px
+}
+.modern{
+ text-align:center;border-top:6px solid #0878ed
+}
+.simple{font-family:Georgia,serif}
+
+@media(min-width:700px){
+ .main{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px
+ }
+}
+
+@media print{
+ header,.card{display:none}
+ .main{display:block;margin:0}
+ .resume{box-shadow:none}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>ResumeBuilder</h1>
+<p>Create an ATS-friendly professional resume</p>
+
+<button onclick="exportPDF()">Export PDF</button>
+<button onclick="exportDOC()">Export DOC</button>
+</header>
+
+
+<div class="main">
+
+<!-- FORM -->
+
+<div class="card">
+
+<h2>Build Your Resume</h2>
+
+<div class="title">Choose Template</div>
+
+<select id="template" onchange="changeTemplate()">
+<option value="classic">ATS Classic</option>
+<option value="modern">Modern</option>
+<option value="simple">Simple</option>
+</select>
+
+
+<div class="title">Profile Photo</div>
+
+<input type="file" id="file" accept="image/*">
+
+
+<div class="title">Personal Information</div>
+
+<input id="name" placeholder="Full Name">
+<input id="job" placeholder="Job Title / Career">
+<input id="email" placeholder="Email Address">
+<input id="phone" placeholder="Phone Number">
+<input id="city" placeholder="City, State">
+
+
+<div class="title">Professional Summary</div>
+
+<textarea id="summary"
+placeholder="Write your professional summary..."></textarea>
+
+
+<div class="title">Work Experience</div>
+
+<textarea id="experience"
+placeholder="Company, role, responsibilities, achievements..."></textarea>
+
+
+<div class="title">Education</div>
+
+<textarea id="education"
+placeholder="Degree, college/university, year..."></textarea>
+
+
+<div class="title">Skills</div>
+
+<textarea id="skills"
+placeholder="Java, Python, SQL, HTML, CSS, React, Git..."></textarea>
+
+
+<div class="title">Projects</div>
+
+<textarea id="projects"
+placeholder="Project name, technologies and description..."></textarea>
+
+
+<div class="title">Job Description</div>
+
+<textarea id="jd"
+placeholder="Paste job description here for ATS keyword matching..."></textarea>
+
+
+<div class="score">
+
+<b>ATS Match Score:
+<span id="score">0%</span>
+</b>
+
+<p id="match">Matched Keywords: -</p>
+
+<p id="missing">Missing Keywords: -</p>
+
+</div>
+
+
+<button onclick="exportPDF()">Export PDF</button>
+
+<button onclick="exportDOC()">Export DOC</button>
+
+<button onclick="window.print()">Print Resume</button>
+
+</div>
+
+
+<!-- RESUME -->
+
+<div class="resume" id="resume">
+
+<img id="photo">
+
+<h1 id="rname">YOUR NAME</h1>
+
+<div class="job" id="rjob">
+Professional Title
+</div>
+
+<p id="contact">
+email@example.com<br>
++91 9876543210<br>
+Your Location
+</p>
+
+
+<div class="sec">
+<h4>PROFILE</h4>
+<p id="rsummary">
+Your professional summary will appear here.
+</p>
+</div>
+
+
+<div class="sec">
+<h4>EXPERIENCE</h4>
+<p id="rexperience">
+Your work experience will appear here.
+</p>
+</div>
+
+
+<div class="sec">
+<h4>EDUCATION</h4>
+<p id="reducation">
+Your education details will appear here.
+</p>
+</div>
+
+
+<div class="sec">
+<h4>SKILLS</h4>
+<p id="rskills">
+Your skills will appear here.
+</p>
+</div>
+
+
+<div class="sec">
+<h4>PROJECTS</h4>
+<p id="rprojects">
+Your project details will appear here.
+</p>
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* LIVE RESUME */
+
+let fields=[
+["name","rname","YOUR NAME"],
+["job","rjob","Professional Title"],
+["summary","rsummary","Your professional summary will appear here."],
+["experience","rexperience","Your work experience will appear here."],
+["education","reducation","Your education details will appear here."],
+["skills","rskills","Your skills will appear here."],
+["projects","rprojects","Your project details will appear here."]
+];
+
+fields.forEach(x=>{
+
+ document.getElementById(x[0]).oninput=()=>{
+
+  document.getElementById(x[1]).innerText=
+  document.getElementById(x[0]).value||x[2];
+
+  ats();
+ };
+
+});
+
+
+/* CONTACT */
+
+["email","phone","city"].forEach(id=>{
+
+ document.getElementById(id).oninput=()=>{
+
+  contact.innerHTML=
+  (email.value||"email@example.com")+"<br>"+
+  (phone.value||"+91 9876543210")+"<br>"+
+  (city.value||"Your Location");
+
+ };
+
+});
+
+
+/* ATS */
+
+function ats(){
+
+ let text=(
+ name.value+" "+
+ job.value+" "+
+ summary.value+" "+
+ experience.value+" "+
+ education.value+" "+
+ skills.value+" "+
+ projects.value
+ ).toLowerCase();
+
+ let jdtext=jd.value.toLowerCase();
+
+ if(!jdtext.trim()){
+
+  score.innerText="0%";
+  match.innerText="Matched Keywords: -";
+  missing.innerText="Missing Keywords: -";
+  return;
+ }
+
+ let words=[...new Set(
+ jdtext.match(/[a-zA-Z][a-zA-Z+#.-]{2,}/g)||[]
+ )];
+
+ let common=[
+ "java","python","javascript","html","css",
+ "react","sql","git","github","node","nodejs",
+ "php","c++","excel","communication","leadership",
+ "management","testing","api","mongodb","mysql",
+ "project","developer","team","software","data",
+ "analysis","aws","cloud","css3","html5"
+ ];
+
+ let keys=words.filter(w=>common.includes(w));
+
+ let matched=keys.filter(w=>text.includes(w));
+
+ let missingKeys=keys.filter(w=>!text.includes(w));
+
+ let percent=keys.length
+ ?Math.round(matched.length/keys.length*100):0;
+
+ score.innerText=percent+"%";
+
+ match.innerText=
+ "Matched Keywords: "+
+ (matched.length?matched.join(", "):"-");
+
+ missing.innerText=
+ "Missing Keywords: "+
+ (missingKeys.length?missingKeys.join(", "):"None");
+}
+
+
+/* PHOTO */
+
+file.onchange=()=>{
+
+ let reader=new FileReader();
+
+ reader.onload=()=>{
+
+  photo.src=reader.result;
+  photo.style.display="block";
+
+ };
+
+ if(file.files[0])
+ reader.readAsDataURL(file.files[0]);
+
+};
+
+
+/* TEMPLATE */
+
+function changeTemplate(){
+
+ resume.className=
+ "resume "+template.value;
+
+}
+
+
+/* PDF */
+
+function exportPDF(){
+
+ window.print();
+
+}
+
+
+/* DOC */
+
+function exportDOC(){
+
+ let content=document.getElementById("resume").innerHTML;
+
+ let html=`
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+body{
+ font-family:Arial;
+ padding:30px;
+ color:#222;
+}
+
+h1{
+ font-size:28px;
+}
+
+h4{
+ border-bottom:1px solid #555;
+ padding-bottom:5px;
+}
+
+.job{
+ color:#0878ed;
+}
+
+img{
+ width:80px;
+ height:80px;
+ object-fit:cover;
+ border-radius:50%;
+}
+
+</style>
+
+</head>
+
+<body>
+
+${content}
+
+</body>
+
+</html>
+`;
+
+ let blob=new Blob(
+ [html],
+ {type:"application/msword"}
+ );
+
+ let url=URL.createObjectURL(blob);
+
+ let a=document.createElement("a");
+
+ a.href=url;
+ a.download="My_ATS_Resume.doc";
+
+ document.body.appendChild(a);
+
+ a.click();
+
+ document.body.removeChild(a);
+
+ URL.revokeObjectURL(url);
+
+}
+
+</script>
+
+</body>
+</html>
